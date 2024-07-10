@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل الطلب</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"], input[type="tel"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #0073e6;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #005bb5;
+        }
+        a {
+            display: block;
+            margin-top: 20px;
+            color: #0073e6;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>تفاصيل الطلب</h2>
+    <input type="text" id="customer-name" placeholder="اسم الزبون" required>
+    <input type="tel" id="customer-phone" placeholder="رقم الهاتف" required>
+    <input type="text" id="customer-address" placeholder="مكان السكن" required>
+    <input type="text" id="customer-home-address" placeholder="عنوان المنزل" required>
+    <input type="text" id="customer-floor-number" placeholder="رقم الطابق" required>
+
+    <!-- عربة التسوق -->
+    <div id="shopping-cart" style="display: none;">
+        <h3>عربة التسوق</h3>
+        <ul id="cart-items">
+            <!-- ستتم إضافة عناصر العربة هنا -->
+        </ul>
+        <button onclick="calculateTotal()">احسب المجموع</button>
+    </div>
+
+    <button onclick="addToCart()">إضافة المنتج إلى العربة</button>
+    <button onclick="confirmOrder()">تأكيد الطلب</button>
+    <a href="(STPNI).html"><h4>العودة إلى صفحة الشراء</h4></a>
+</div>
+
+<script>
+    let shoppingCart = [];
+
+    // دالة اضافة المنتج الى عربة التسوق
+    function addToCart() {
+        const productName = prompt('اسم المنتج:');
+        const productPrice = parseFloat(prompt('سعر المنتج:'));
+
+        if (productName && productPrice) {
+            shoppingCart.push({ name: productName, price: productPrice });
+            updateCartDisplay(); // تحديث عرض عربة التسوق
+            document.getElementById('shopping-cart').style.display = 'block'; // عرض عربة التسوق بعد الإضافة الأولى
+        } else {
+            alert('يرجى إدخال اسم المنتج وسعره بشكل صحيح');
+        }
+    }
+
+    // دالة لتحديث عرض عربة التسوق
+    function updateCartDisplay() {
+        const cartItemsElement = document.getElementById('cart-items');
+        cartItemsElement.innerHTML = '';
+
+        shoppingCart.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.name}: ${item.price} دولار`;
+            cartItemsElement.appendChild(li);
+        });
+    }
+
+    // دالة احساب المجموع
+    function calculateTotal() {
+        let totalAmount = 0;
+        shoppingCart.forEach(item => {
+            totalAmount += item.price;
+        });
+
+        const totalElement = document.createElement('p');
+        totalElement.textContent = `المجموع: ${totalAmount} دولار`;
+        
+        const shoppingCartDiv = document.getElementById('shopping-cart');
+        shoppingCartDiv.appendChild(totalElement);
+
+        // إخفاء زر إضافة المنتج إلى العربة بعد حساب المجموع
+        const addButton = document.querySelector('button[onclick="addToCart()"]');
+        addButton.style.display = 'none';
+    }
+
+    // دالة تأكيد الطلب
+    function confirmOrder() {
+        const name = document.getElementById('customer-name').value;
+        const phone = document.getElementById('customer-phone').value;
+        const address = document.getElementById('customer-address').value;
+        const homeAddress = document.getElementById('customer-home-address').value;
+        const floorNumber = document.getElementById('customer-floor-number').value;
+
+        if (name && phone && address && homeAddress && floorNumber && shoppingCart.length > 0) {
+            // حساب مجموع الحساب
+            let totalAmount = 0;
+            shoppingCart.forEach(item => {
+                totalAmount += item.price;
+            });
+
+            // إعداد تفاصيل الطلب
+            let orderDetails = `اسم الزبون: ${name}\nرقم الهاتف: ${phone}\nمكان السكن: ${address}\nعنوان المنزل: ${homeAddress}\nرقم الطابق: ${floorNumber}\n\nتفاصيل الطلب:\n`;
+            shoppingCart.forEach(item => {
+                orderDetails += `${item.name}: ${item.price} دولار\n`;
+            });
+            orderDetails += `\nالمجموع: ${totalAmount} دولار`;
+
+            // إعداد رسالة الواتساب للسوبر ماركت
+            const supermarketPhoneNumber = '96181479786'; // رقم الهاتف للسوبر ماركت
+            const supermarketMessage = orderDetails;
+            const supermarketWhatsappUrl = `https://wa.me/${supermarketPhoneNumber}?text=${encodeURIComponent(supermarketMessage)}`;
+
+            // فتح نافذة واتساب تلقائيًا للسوبر ماركت
+            window.open(supermarketWhatsappUrl, '_blank');
+
+            // إعداد رسالة الواتساب للزبون
+            const driverPhoneNumber = '96181479786'; // رقم السائق الفعلي بدون علامة +
+            const driverMessage = `تم تأكيد طلبك بنجاح!\n\n${orderDetails}`;
+            const whatsappUrl = `https://wa.me/${driverPhoneNumber}?text=${encodeURIComponent(driverMessage)}`;
+
+            // فتح نافذة واتساب تلقائيًا للزبون
+            window.open(whatsappUrl, '_blank');
+        } else {
+            alert('يرجى ملء جميع الحقول وإضافة منتجات إلى عربة التسوق');
+        }
+    }
+</script>
+</body>
+</html>
+
